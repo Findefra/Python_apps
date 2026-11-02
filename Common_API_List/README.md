@@ -1,12 +1,14 @@
-# Common API List – Top 25 Most Used Python Libraries
+# Common API List – Top Python Libraries
 
-Ranked by real-world usage, PyPI downloads, and developer adoption (2026).
+Ranked by real-world usage, PyPI downloads, and professional adoption (2026).
 
 Each entry includes:
 - `pip` install command
 - Short, practical usage example
 
 ---
+
+## Core / Most Used (1–25)
 
 ### 1. boto3 – AWS SDK
 ```bash
@@ -130,7 +132,6 @@ pip install python-dateutil
 ```python
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
-from datetime import datetime
 
 dt = parser.parse("2026-11-02")
 print(dt + relativedelta(months=1))
@@ -175,8 +176,6 @@ def add(a, b):
 
 def test_add():
     assert add(2, 3) == 5
-
-# Run with: pytest
 ```
 
 ### 14. sqlalchemy – SQL Toolkit & ORM
@@ -201,7 +200,6 @@ import httpx
 
 response = httpx.get("https://api.github.com")
 print(response.status_code)
-print(response.json())
 ```
 
 ### 16. aiohttp – Async HTTP Client/Server
@@ -225,11 +223,6 @@ asyncio.run(main())
 pip install django
 ```
 ```python
-# Create project
-# django-admin startproject mysite
-# python manage.py runserver
-
-# Example view (views.py)
 from django.http import JsonResponse
 
 def home(request):
@@ -248,9 +241,6 @@ app = Flask(__name__)
 @app.route("/")
 def hello():
     return {"message": "Hello from Flask"}
-
-if __name__ == "__main__":
-    app.run(debug=True)
 ```
 
 ### 19. scikit-learn – Machine Learning
@@ -263,7 +253,6 @@ import numpy as np
 
 X = np.array([[1], [2], [3], [4]])
 y = np.array([2, 4, 6, 8])
-
 model = LinearRegression().fit(X, y)
 print(model.predict([[5]]))
 ```
@@ -287,8 +276,7 @@ pip install openai
 ```python
 from openai import OpenAI
 
-client = OpenAI()  # uses OPENAI_API_KEY env var
-
+client = OpenAI()
 response = client.chat.completions.create(
     model="gpt-4o-mini",
     messages=[{"role": "user", "content": "Say hello in one sentence"}]
@@ -303,10 +291,8 @@ pip install pillow
 ```python
 from PIL import Image
 
-# Create a simple image
 img = Image.new("RGB", (100, 100), color="red")
 img.save("red_square.png")
-print(img.size)
 ```
 
 ### 23. beautifulsoup4 – HTML/XML Parsing
@@ -332,7 +318,6 @@ from selenium.webdriver.chrome.options import Options
 options = Options()
 options.add_argument("--headless")
 driver = webdriver.Chrome(options=options)
-
 driver.get("https://example.com")
 print(driver.title)
 driver.quit()
@@ -352,10 +337,372 @@ print(r.get("key"))
 
 ---
 
-## Quick Install All (optional)
+## Advanced / Professional Libraries (26–50)
 
+### 26. kubernetes – Kubernetes Python Client
 ```bash
-pip install boto3 requests numpy pandas pydantic fastapi uvicorn pyyaml python-dateutil cryptography click pytest sqlalchemy httpx aiohttp django flask scikit-learn torch openai pillow beautifulsoup4 selenium redis
+pip install kubernetes
+```
+```python
+from kubernetes import client, config
+
+config.load_kube_config()
+v1 = client.CoreV1Api()
+pods = v1.list_pod_for_all_namespaces()
+print([p.metadata.name for p in pods.items[:5]])
 ```
 
-> **Note**: Some packages (especially `torch`, `selenium`, and AWS libraries) have additional system or environment requirements.
+### 27. azure-identity + azure-mgmt – Azure SDK
+```bash
+pip install azure-identity azure-mgmt-resource
+```
+```python
+from azure.identity import DefaultAzureCredential
+from azure.mgmt.resource import ResourceManagementClient
+
+credential = DefaultAzureCredential()
+client = ResourceManagementClient(credential, "<subscription-id>")
+for rg in client.resource_groups.list():
+    print(rg.name)
+```
+
+### 28. google-cloud-storage – Google Cloud Storage
+```bash
+pip install google-cloud-storage
+```
+```python
+from google.cloud import storage
+
+client = storage.Client()
+buckets = list(client.list_buckets())
+print([b.name for b in buckets])
+```
+
+### 29. polars – Fast DataFrame Library
+```bash
+pip install polars
+```
+```python
+import polars as pl
+
+df = pl.DataFrame({"name": ["Alice", "Bob"], "age": [25, 30]})
+print(df.filter(pl.col("age") > 26))
+```
+
+### 30. langchain – LLM Application Framework
+```bash
+pip install langchain langchain-openai
+```
+```python
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+
+llm = ChatOpenAI(model="gpt-4o-mini")
+prompt = ChatPromptTemplate.from_template("Tell me a short fact about {topic}")
+chain = prompt | llm
+print(chain.invoke({"topic": "Kubernetes"}).content)
+```
+
+### 31. anthropic – Anthropic Claude API
+```bash
+pip install anthropic
+```
+```python
+from anthropic import Anthropic
+
+client = Anthropic()
+message = client.messages.create(
+    model="claude-sonnet-4-20250514",
+    max_tokens=100,
+    messages=[{"role": "user", "content": "Explain async Python in one sentence"}]
+)
+print(message.content[0].text)
+```
+
+### 32. celery – Distributed Task Queue
+```bash
+pip install celery
+```
+```python
+from celery import Celery
+
+app = Celery("tasks", broker="redis://localhost:6379/0")
+
+@app.task
+def add(x, y):
+    return x + y
+
+# result = add.delay(4, 6)
+```
+
+### 33. tenacity – Retry Library
+```bash
+pip install tenacity
+```
+```python
+from tenacity import retry, stop_after_attempt, wait_fixed
+
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+def might_fail():
+    print("Trying...")
+    raise Exception("Failed")
+```
+
+### 34. structlog – Structured Logging
+```bash
+pip install structlog
+```
+```python
+import structlog
+
+logger = structlog.get_logger()
+logger.info("user_logged_in", user_id=42, ip="10.0.0.1")
+```
+
+### 35. rich – Beautiful Terminal Output
+```bash
+pip install rich
+```
+```python
+from rich.console import Console
+from rich.table import Table
+
+console = Console()
+table = Table(title="Servers")
+table.add_column("Name")
+table.add_column("Status")
+table.add_row("web-01", "[green]healthy[/green]")
+console.print(table)
+```
+
+### 36. typer – Modern CLI (built on Click)
+```bash
+pip install typer
+```
+```python
+import typer
+
+app = typer.Typer()
+
+@app.command()
+def hello(name: str = "World"):
+    print(f"Hello {name}")
+
+if __name__ == "__main__":
+    app()
+```
+
+### 37. httpx + anyio – Advanced Async HTTP
+```bash
+pip install httpx anyio
+```
+```python
+import httpx
+import anyio
+
+async def main():
+    async with httpx.AsyncClient() as client:
+        r = await client.get("https://httpbin.org/get")
+        print(r.json())
+
+anyio.run(main)
+```
+
+### 38. alembic – Database Migrations
+```bash
+pip install alembic
+```
+```python
+# alembic init migrations
+# alembic revision --autogenerate -m "create users table"
+# alembic upgrade head
+```
+
+### 39. prometheus-client – Metrics
+```bash
+pip install prometheus-client
+```
+```python
+from prometheus_client import Counter, start_http_server
+
+REQUESTS = Counter("app_requests_total", "Total requests")
+REQUESTS.inc()
+start_http_server(8000)
+```
+
+### 40. opentelemetry-api – Observability
+```bash
+pip install opentelemetry-api opentelemetry-sdk
+```
+```python
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+
+trace.set_tracer_provider(TracerProvider())
+tracer = trace.get_tracer(__name__)
+
+with tracer.start_as_current_span("my-operation"):
+    print("Tracing...")
+```
+
+### 41. paramiko – SSH Client
+```bash
+pip install paramiko
+```
+```python
+import paramiko
+
+client = paramiko.SSHClient()
+client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+client.connect("example.com", username="user", password="pass")
+stdin, stdout, stderr = client.exec_command("uptime")
+print(stdout.read().decode())
+client.close()
+```
+
+### 42. fabric – High-level SSH / Deployment
+```bash
+pip install fabric
+```
+```python
+from fabric import Connection
+
+c = Connection("user@example.com")
+result = c.run("uname -a", hide=True)
+print(result.stdout)
+```
+
+### 43. docker – Docker SDK
+```bash
+pip install docker
+```
+```python
+import docker
+
+client = docker.from_env()
+containers = client.containers.list()
+print([c.name for c in containers])
+```
+
+### 44. apache-airflow – Workflow Orchestration
+```bash
+pip install apache-airflow
+```
+```python
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime
+
+def hello():
+    print("Hello from Airflow")
+
+with DAG("example", start_date=datetime(2026, 1, 1), schedule=None) as dag:
+    PythonOperator(task_id="hello", python_callable=hello)
+```
+
+### 45. dask – Parallel Computing
+```bash
+pip install dask[complete]
+```
+```python
+import dask.array as da
+
+x = da.random.random((10000, 10000), chunks=(1000, 1000))
+print(x.mean().compute())
+```
+
+### 46. ray – Distributed Computing & ML
+```bash
+pip install ray
+```
+```python
+import ray
+
+ray.init()
+
+@ray.remote
+def f(x):
+    return x * x
+
+futures = [f.remote(i) for i in range(4)]
+print(ray.get(futures))
+```
+
+### 47. transformers – Hugging Face
+```bash
+pip install transformers
+```
+```python
+from transformers import pipeline
+
+classifier = pipeline("sentiment-analysis")
+result = classifier("I love using advanced Python libraries!")
+print(result)
+```
+
+### 48. litellm – Unified LLM API
+```bash
+pip install litellm
+```
+```python
+from litellm import completion
+
+response = completion(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": "Hello"}]
+)
+print(response.choices[0].message.content)
+```
+
+### 49. pydantic-settings – Settings Management
+```bash
+pip install pydantic-settings
+```
+```python
+from pydantic_settings import BaseSettings
+
+class Settings(BaseSettings):
+    app_name: str = "MyApp"
+    debug: bool = False
+
+    class Config:
+        env_file = ".env"
+
+settings = Settings()
+print(settings.app_name)
+```
+
+### 50. uvloop – High-performance Event Loop
+```bash
+pip install uvloop
+```
+```python
+import asyncio
+import uvloop
+
+uvloop.install()  # replaces the default event loop
+
+async def main():
+    print("Running with uvloop")
+
+asyncio.run(main())
+```
+
+---
+
+## Quick Install Groups
+
+**Core set:**
+```bash
+pip install boto3 requests numpy pandas pydantic fastapi uvicorn httpx redis sqlalchemy
+```
+
+**Advanced / DevOps / Cloud:**
+```bash
+pip install kubernetes docker paramiko fabric azure-identity google-cloud-storage prometheus-client opentelemetry-api structlog tenacity rich typer
+```
+
+**AI / LLM stack:**
+```bash
+pip install openai anthropic langchain langchain-openai transformers litellm
+```
