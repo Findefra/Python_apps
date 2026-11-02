@@ -83,8 +83,6 @@ app = FastAPI()
 @app.get("/")
 def root():
     return {"message": "Hello World"}
-
-# Run with: uvicorn main:app --reload
 ```
 
 ### 7. urllib3 – Low-level HTTP
@@ -431,8 +429,6 @@ app = Celery("tasks", broker="redis://localhost:6379/0")
 @app.task
 def add(x, y):
     return x + y
-
-# result = add.delay(4, 6)
 ```
 
 ### 33. tenacity – Retry Library
@@ -475,7 +471,7 @@ table.add_row("web-01", "[green]healthy[/green]")
 console.print(table)
 ```
 
-### 36. typer – Modern CLI (built on Click)
+### 36. typer – Modern CLI
 ```bash
 pip install typer
 ```
@@ -680,12 +676,391 @@ pip install uvloop
 import asyncio
 import uvloop
 
-uvloop.install()  # replaces the default event loop
+uvloop.install()
 
 async def main():
     print("Running with uvloop")
 
 asyncio.run(main())
+```
+
+---
+
+## Specialized / Expert-Level Libraries (51–75)
+
+### 51. pulumi – Infrastructure as Code (Python)
+```bash
+pip install pulumi pulumi-aws
+```
+```python
+import pulumi
+import pulumi_aws as aws
+
+bucket = aws.s3.Bucket("my-bucket")
+pulumi.export("bucket_name", bucket.id)
+```
+
+### 52. cdktf – Terraform CDK for Python
+```bash
+pip install cdktf cdktf-cdktf-provider-aws
+```
+```python
+from cdktf import App, TerraformStack
+from constructs import Construct
+from cdktf_cdktf_provider_aws.provider import AwsProvider
+from cdktf_cdktf_provider_aws.s3_bucket import S3Bucket
+
+class MyStack(TerraformStack):
+    def __init__(self, scope: Construct, id: str):
+        super().__init__(scope, id)
+        AwsProvider(self, "AWS", region="us-east-1")
+        S3Bucket(self, "bucket", bucket="my-cdktf-bucket")
+
+app = App()
+MyStack(app, "python-aws")
+app.synth()
+```
+
+### 53. boto3 + aioboto3 – Async AWS
+```bash
+pip install aioboto3
+```
+```python
+import aioboto3
+import asyncio
+
+async def main():
+    session = aioboto3.Session()
+    async with session.client("s3") as s3:
+        response = await s3.list_buckets()
+        print([b["Name"] for b in response["Buckets"]])
+
+asyncio.run(main())
+```
+
+### 54. moto – AWS Mocking / Testing
+```bash
+pip install moto[all]
+```
+```python
+from moto import mock_aws
+import boto3
+
+@mock_aws
+def test_s3():
+    s3 = boto3.client("s3", region_name="us-east-1")
+    s3.create_bucket(Bucket="test-bucket")
+    print(s3.list_buckets())
+```
+
+### 55. localstack – Local AWS Cloud Emulator
+```bash
+pip install localstack
+```
+```python
+# Start with: localstack start
+# Then point boto3 to http://localhost:4566
+import boto3
+
+s3 = boto3.client("s3", endpoint_url="http://localhost:4566")
+s3.create_bucket(Bucket="local-bucket")
+```
+
+### 56. great-expectations – Data Quality
+```bash
+pip install great-expectations
+```
+```python
+import great_expectations as gx
+
+context = gx.get_context()
+validator = context.sources.pandas_default.read_csv("data.csv")
+validator.expect_column_values_to_not_be_null("id")
+```
+
+### 57. prefect – Modern Workflow Orchestration
+```bash
+pip install prefect
+```
+```python
+from prefect import flow, task
+
+@task
+def say_hello(name: str):
+    print(f"Hello {name}")
+
+@flow
+def hello_flow():
+    say_hello("World")
+
+hello_flow()
+```
+
+### 58. dagster – Data Orchestration
+```bash
+pip install dagster
+```
+```python
+from dagster import asset, materialize
+
+@asset
+def hello_asset():
+    return "Hello from Dagster"
+
+materialize([hello_asset])
+```
+
+### 59. llama-index – RAG Framework
+```bash
+pip install llama-index
+```
+```python
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
+
+documents = SimpleDirectoryReader("data").load_data()
+index = VectorStoreIndex.from_documents(documents)
+query_engine = index.as_query_engine()
+print(query_engine.query("What is this about?"))
+```
+
+### 60. crewai – Multi-Agent AI Systems
+```bash
+pip install crewai
+```
+```python
+from crewai import Agent, Task, Crew
+
+researcher = Agent(
+    role="Researcher",
+    goal="Find accurate information",
+    backstory="Expert researcher"
+)
+
+task = Task(description="Research Python async", agent=researcher)
+crew = Crew(agents=[researcher], tasks=[task])
+result = crew.kickoff()
+```
+
+### 61. semantic-kernel – Microsoft AI Orchestration
+```bash
+pip install semantic-kernel
+```
+```python
+import semantic_kernel as sk
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
+
+kernel = sk.Kernel()
+kernel.add_service(OpenAIChatCompletion(ai_model_id="gpt-4o-mini"))
+```
+
+### 62. guardrails-ai – LLM Output Validation
+```bash
+pip install guardrails-ai
+```
+```python
+from guardrails import Guard
+from guardrails.hub import RegexMatch
+
+guard = Guard().use(RegexMatch(regex="^[A-Z].*"))
+result = guard.parse("Hello world")
+```
+
+### 63. instructor – Structured LLM Outputs
+```bash
+pip install instructor
+```
+```python
+import instructor
+from openai import OpenAI
+from pydantic import BaseModel
+
+class User(BaseModel):
+    name: str
+    age: int
+
+client = instructor.from_openai(OpenAI())
+user = client.chat.completions.create(
+    model="gpt-4o-mini",
+    response_model=User,
+    messages=[{"role": "user", "content": "Extract: Alice is 30"}]
+)
+print(user)
+```
+
+### 64. chromadb – Vector Database
+```bash
+pip install chromadb
+```
+```python
+import chromadb
+
+client = chromadb.Client()
+collection = client.create_collection("docs")
+collection.add(documents=["Python is great"], ids=["1"])
+results = collection.query(query_texts=["Python"], n_results=1)
+print(results)
+```
+
+### 65. qdrant-client – Vector Search
+```bash
+pip install qdrant-client
+```
+```python
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, VectorParams
+
+client = QdrantClient(":memory:")
+client.create_collection(
+    collection_name="test",
+    vectors_config=VectorParams(size=4, distance=Distance.COSINE)
+)
+```
+
+### 66. netmiko – Network Device Automation
+```bash
+pip install netmiko
+```
+```python
+from netmiko import ConnectHandler
+
+device = {
+    "device_type": "cisco_ios",
+    "host": "192.168.1.1",
+    "username": "admin",
+    "password": "password"
+}
+
+with ConnectHandler(**device) as conn:
+    output = conn.send_command("show ip interface brief")
+    print(output)
+```
+
+### 67. napalm – Network Automation Abstraction
+```bash
+pip install napalm
+```
+```python
+from napalm import get_network_driver
+
+driver = get_network_driver("eos")
+device = driver("192.168.1.1", "admin", "password")
+device.open()
+print(device.get_facts())
+device.close()
+```
+
+### 68. scrapy – Advanced Web Scraping Framework
+```bash
+pip install scrapy
+```
+```python
+import scrapy
+
+class QuotesSpider(scrapy.Spider):
+    name = "quotes"
+    start_urls = ["https://quotes.toscrape.com"]
+
+    def parse(self, response):
+        for quote in response.css("div.quote"):
+            yield {"text": quote.css("span.text::text").get()}
+```
+
+### 69. playwright – Modern Browser Automation
+```bash
+pip install playwright
+playwright install
+```
+```python
+from playwright.sync_api import sync_playwright
+
+with sync_playwright() as p:
+    browser = p.chromium.launch()
+    page = browser.new_page()
+    page.goto("https://example.com")
+    print(page.title())
+    browser.close()
+```
+
+### 70. locust – Load Testing
+```bash
+pip install locust
+```
+```python
+from locust import HttpUser, task, between
+
+class WebsiteUser(HttpUser):
+    wait_time = between(1, 3)
+
+    @task
+    def index(self):
+        self.client.get("/")
+```
+
+### 71. hypothesis – Property-Based Testing
+```bash
+pip install hypothesis
+```
+```python
+from hypothesis import given, strategies as st
+
+@given(st.integers(), st.integers())
+def test_addition_commutative(a, b):
+    assert a + b == b + a
+```
+
+### 72. freethreaded / concurrent.futures advanced patterns
+```bash
+# Standard library + optional
+pip install concurrent-log-handler
+```
+```python
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+
+def work(x):
+    return x * x
+
+with ThreadPoolExecutor(max_workers=4) as executor:
+    results = list(executor.map(work, range(10)))
+print(results)
+```
+
+### 73. orjson – Ultra-fast JSON
+```bash
+pip install orjson
+```
+```python
+import orjson
+
+data = {"name": "Alice", "age": 30}
+encoded = orjson.dumps(data)
+print(orjson.loads(encoded))
+```
+
+### 74. msgspec – High-performance Serialization
+```bash
+pip install msgspec
+```
+```python
+import msgspec
+
+class User(msgspec.Struct):
+    name: str
+    age: int
+
+user = User(name="Alice", age=30)
+print(msgspec.json.encode(user))
+```
+
+### 75. cython – Python to C Compiler
+```bash
+pip install cython
+```
+```python
+# example.pyx
+# def add(int a, int b):
+#     return a + b
+
+# Compile with: cythonize -i example.pyx
 ```
 
 ---
@@ -699,10 +1074,15 @@ pip install boto3 requests numpy pandas pydantic fastapi uvicorn httpx redis sql
 
 **Advanced / DevOps / Cloud:**
 ```bash
-pip install kubernetes docker paramiko fabric azure-identity google-cloud-storage prometheus-client opentelemetry-api structlog tenacity rich typer
+pip install kubernetes docker paramiko fabric azure-identity google-cloud-storage prometheus-client opentelemetry-api structlog tenacity rich typer aioboto3 moto
 ```
 
-**AI / LLM stack:**
+**AI / LLM / Agents stack:**
 ```bash
-pip install openai anthropic langchain langchain-openai transformers litellm
+pip install openai anthropic langchain langchain-openai transformers litellm llama-index crewai instructor chromadb
+```
+
+**Specialized / Expert:**
+```bash
+pip install pulumi prefect dagster great-expectations playwright locust hypothesis orjson msgspec netmiko
 ```
