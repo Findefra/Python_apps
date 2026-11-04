@@ -1,21 +1,9 @@
-# Python_Apps_Scripts
+# Migrated — do not add new code here
 
+Python samples now live in:
 
-Quick GitHub setup for any of these
-----------------------------------------------------------
-mkdir <repo-name> && cd <repo-name>
-python -m venv .venv && source .venv/bin/activate
-pip install <deps>
-# add the Python file(s)
-echo -e ".venv/\n__pycache__/\n*.pyc\n.env" > .gitignore
-# write a solid README.md
-git init && git add . && git commit -m "Initial POC"
+**→ [External-Citadel](https://github.com/Findefra/External-Citadel) / `Automation/python/`**
 
-------------------------------------------------------------
+Production Python utilities: [Internal-Citadel](https://github.com/Findefra/Internal-Citadel) / `Automation/python/`
 
-These five are a strong mix of:
-Platform / Image Builder tooling
-Secure instance launching
-Internal dashboards
-ML serving
-Governance / tagging
+This repo is retained for history and will be archived.
